@@ -1,0 +1,121 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <link rel="icon" type="image/x-icon" href="/favicon.ico" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <!-- Global Error Handler for Debugging -->
+  <script>
+    window.onerror = function (message, source, lineno, colno, error) {
+      // Ignore non-fatal third-party script errors or AbortErrors
+      if (message === 'Script error.' || !source || (message && message.includes('AbortError'))) {
+        console.warn('Silent/Abort Error caught:', message);
+        return;
+      }
+      const errorContainer = document.getElementById('global-error-display') || document.createElement('div');
+      errorContainer.id = 'global-error-display';
+      errorContainer.style.cssText = 'position:fixed;top:0;left:0;width:100%;background:rgba(255,0,0,0.9);color:white;padding:20px;z-index:99999;font-family:monospace;white-space:pre-wrap;cursor:pointer;';
+      errorContainer.onclick = () => errorContainer.remove();
+      errorContainer.innerText += `Global Error: ${message}\nAt: ${source}:${lineno}:${colno}\n\n`;
+      document.body.appendChild(errorContainer);
+      console.error('Global Error caught:', message, error);
+    };
+    window.onunhandledrejection = function (event) {
+      const reason = String(event.reason);
+      // Ignore AbortError - usually harmless (fetch abort, navigator.share cancel, etc.)
+      if (reason.includes('AbortError')) {
+        console.warn('Unhandled Rejection (AbortError) ignored:', reason);
+        return;
+      }
+      const errorContainer = document.getElementById('global-error-display') || document.createElement('div');
+      errorContainer.id = 'global-error-display';
+      errorContainer.style.cssText = 'position:fixed;top:0;left:0;width:100%;background:rgba(255,0,0,0.9);color:white;padding:20px;z-index:99999;font-family:monospace;white-space:pre-wrap;cursor:pointer;';
+      errorContainer.onclick = () => errorContainer.remove();
+      errorContainer.innerText += `Unhandled Rejection: ${event.reason}\n\n`;
+      document.body.appendChild(errorContainer);
+      console.error('Unhandled Rejection caught:', event.reason);
+    };
+  </script>
+
+  <!-- PWA Meta Tags -->
+  <link rel="manifest" href="/manifest.json" />
+  <link rel="apple-touch-icon" href="/logo.png" />
+  <meta name="theme-color" content="#3b82f6" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="HAPPYY TALK" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="application-name" content="HAPPYY TALK" />
+  <meta name="msapplication-TileColor" content="#3b82f6" />
+  <meta name="msapplication-TileImage" content="/logo.png" />
+  <meta name="msapplication-tap-highlight" content="no" />
+
+  <title>HAPPYY TALK - Connect, Share, Explore</title>
+  <meta name="description"
+    content="HAPPYY TALK is a modern social networking platform where you can connect with friends, share stories, watch reels, and explore content from around the world." />
+  <meta name="keywords"
+    content="social network, stories, reels, photos, explore, connect, happyy talk, feed, social media" />
+  <meta name="author" content="HAPPYY TALK" />
+
+  <!-- Font Awesome -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" rel="stylesheet" />
+
+  <!-- Google Fonts -->
+  <link
+    href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&family=Orbitron:wght@400;700&family=Outfit:wght@300;400;500;600;700;800&family=Inter:wght@300;400;500;600;700&display=swap"
+    rel="stylesheet" />
+
+  <!-- Material Icons -->
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons|Material+Icons+Outlined" rel="stylesheet" />
+
+  <!-- External scripts removed for debugging/stability -->
+</head>
+
+<body>
+  <div id="root"></div>
+
+  <script type="module" src="/src/main.jsx"></script>
+  <script>
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        // Check if we are on localhost
+        const isLocalhost = Boolean(
+          window.location.hostname === 'localhost' ||
+          // [::1] is the IPv6 localhost address.
+          window.location.hostname === '[::1]' ||
+          // 127.0.0.0/8 are considered localhost for IPv4.
+          window.location.hostname.match(
+            /^127(?:\.(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)){3}$/
+          )
+        );
+
+        if (isLocalhost) {
+          // If on localhost, unregister the service worker to avoid caching issues during dev
+          navigator.serviceWorker.getRegistrations().then((registrations) => {
+            for (let registration of registrations) {
+              registration.unregister().then((boolean) => {
+                if (boolean) {
+                  console.log('ServiceWorker unregistered on localhost');
+                  // Optional: Reload page to ensure fresh content
+                  // window.location.reload(); 
+                }
+              });
+            }
+          });
+        } else {
+          // In production, register the service worker
+          navigator.serviceWorker.register('/sw.js')
+            .then((registration) => {
+              console.log('ServiceWorker registration successful with scope: ', registration.scope);
+            }, (err) => {
+              console.log('ServiceWorker registration failed: ', err);
+            });
+        }
+      });
+    }
+  </script>
+</body>
+
+</html>
